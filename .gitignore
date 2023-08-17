@@ -1,0 +1,5 @@
+.env
+/movie_footprints/requirements.txt
+.idea
+.venv
+/docs/_build
