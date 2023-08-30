@@ -15,28 +15,25 @@ Including another URLconf
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
 from django.conf import settings
+from django.conf.urls.static import static
 from django.contrib import admin
 from django.urls import path, include
 
 from rest_framework.routers import DefaultRouter
-from knox import views as knox_views
 
-from core.views import LoginView as KnoxLoginView
+from users.views import AccountCreateViewSet
 
 router = DefaultRouter()
+router.register(r'signup', AccountCreateViewSet)
 
-knox_patterns = [
-    path('api/login/', KnoxLoginView.as_view(), name="login"),
-    path('api/logout/', knox_views.LogoutView.as_view(), name="logout"),
-    path('api/logoutall/', knox_views.LogoutAllView.as_view(), name="logout-all"),
-]
 
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('api/', include(router.urls)),
-] + knox_patterns
+]
 
 if settings.DEBUG:
-    urlpatterns += [
+    urlpatterns += ([
         path("__debug__/", include("debug_toolbar.urls")),
-    ]
+    ] + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
+                    + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT))
