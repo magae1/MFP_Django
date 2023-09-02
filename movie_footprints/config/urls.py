@@ -21,7 +21,7 @@ from django.urls import path, include
 
 from rest_framework.routers import DefaultRouter
 
-from users.views import AccountCreateViewSet
+from users.views import AccountCreateViewSet, confirm_username
 
 router = DefaultRouter()
 router.register(r'signup', AccountCreateViewSet)
@@ -30,6 +30,7 @@ router.register(r'signup', AccountCreateViewSet)
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('api/', include(router.urls)),
+    path('confirm-username/', confirm_username)
 ]
 
 if settings.DEBUG:

@@ -28,8 +28,7 @@ class Profile(models.Model):
 class AccountManager(UserManager):
     def create(self, **fields):
         account = self.create_user(**fields)
-        profile = Profile.objects.create(account=account)
-        profile.save()
+        Profile.objects.create(account=account)
         return account
 
 
