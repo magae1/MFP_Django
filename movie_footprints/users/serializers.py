@@ -16,11 +16,10 @@ class RetypePasswordMixin(serializers.Serializer):
 
 
 class CreateAccountSerializer(RetypePasswordMixin, serializers.Serializer):
-    username = serializers.CharField(validators=
-                                     [UniqueValidator(queryset=Account.objects.all())])
+    identifier = serializers.CharField(validators=[UniqueValidator(queryset=Account.objects.all())])
 
     def create(self, validated_data):
-        account = Account.objects.create(**validated_data)
+        account = Account.objects.create_user(**validated_data)
         return account
 
     def validate(self, attrs):
