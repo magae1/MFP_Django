@@ -1,4 +1,6 @@
 .env
+.env.*
+dockerfiles/.env.*
 /movie_footprints/requirements.txt
 .idea
 .venv

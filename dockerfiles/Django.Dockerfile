@@ -9,7 +9,7 @@ COPY /movie_footprints .
 # requirements/production.txt의 라이브러리 설치
 RUN pip install -r requirements/production.txt
 
-RUN django-admin collectstatic
+RUN ./manage.py collectstatic
 
 # 외부 노출 포트 설정
 EXPOSE 8000

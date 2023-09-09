@@ -14,17 +14,25 @@ from drf_spectacular.views import (
     SpectacularRedocView,
 )
 
-from users.views import AccountCreateViewSet
+from users.views import (
+    AccountCreateViewSet,
+    ProfileViewSet,
+    LogInView,
+    RefreshView,
+    LogOutView,
+)
 
 router = DefaultRouter()
-router.register(r'signup', AccountCreateViewSet)
+router.register(r'auth/signup', AccountCreateViewSet)
+router.register(r'profile', ProfileViewSet)
 
 
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('api/', include(router.urls)),
-    path('api/token/', TokenObtainPairView.as_view(), name='token_obtain_pair'),
-    path('api/token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
+    path('api/auth/login/', LogInView.as_view(), name="로그인"),
+    path('api/auth/refresh/', RefreshView.as_view(), name="토큰 갱신"),
+    path('api/auth/logout/', LogOutView.as_view(), name="로그아웃"),
     path('api/schema/', SpectacularAPIView.as_view(), name='schema'),
     path('api/schema/swagger-ui/', SpectacularSwaggerView.as_view(url_name='schema'), name='swagger-ui'),
     path('api/schema/redoc/', SpectacularRedocView.as_view(url_name='schema'), name='redoc'),

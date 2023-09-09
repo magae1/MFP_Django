@@ -14,7 +14,7 @@ def random_name():
 
 
 class Profile(models.Model):
-    account = models.OneToOneField('Account', on_delete=models.CASCADE)
+    account = models.OneToOneField('Account', on_delete=models.SET_NULL, null=True)
     avatar = models.ImageField(_("아바타"), upload_to='profile/', blank=True)
     nickname = models.CharField(verbose_name=_("닉네임"), default=random_name, max_length=30)
     introduction = models.CharField(verbose_name=_("소개"), max_length=300, blank=True)
@@ -70,7 +70,7 @@ class Account(AbstractUser):
         max_length=40,
         unique=True,
         help_text=_("5~40자의 영문 소문자, 숫자와 특수기호(_),(-)만 사용 가능합니다."),
-        validators=[MinLengthValidator(5), RegexValidator(regex=r'[A-Za-z0-9_\-]+')],
+        validators=[MinLengthValidator(5), RegexValidator(regex=r'[a-z0-9_\-]+')],
         error_messages={
             "unique": _("이미 존재하는 아이디입니다."),
         },

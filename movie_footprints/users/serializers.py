@@ -1,5 +1,11 @@
+from django.contrib.auth.password_validation import validate_password as validate_pw
+from django.contrib.auth.models import AbstractBaseUser, update_last_login
+
 from rest_framework import serializers
 from rest_framework.validators import UniqueValidator
+from rest_framework_simplejwt.serializers import TokenObtainSerializer
+from rest_framework_simplejwt.tokens import RefreshToken
+from rest_framework_simplejwt.settings import api_settings
 
 from .models import Profile, Account
 
@@ -7,6 +13,10 @@ from .models import Profile, Account
 class RetypePasswordMixin(serializers.Serializer):
     password = serializers.CharField(style={"input_type": "password"}, write_only=True)
     re_password = serializers.CharField(style={"input_type": "password"}, write_only=True)
+
+    def validate_password(self, value):
+        validate_pw(value)
+        return value
 
     def validate(self, attrs):
         re_password = attrs.pop("re_password")
@@ -17,6 +27,7 @@ class RetypePasswordMixin(serializers.Serializer):
 
 class CreateAccountSerializer(RetypePasswordMixin, serializers.Serializer):
     identifier = serializers.CharField(validators=[UniqueValidator(queryset=Account.objects.all())])
+    email = serializers.EmailField(allow_blank=True)
 
     def create(self, validated_data):
         account = Account.objects.create_user(**validated_data)
@@ -31,3 +42,21 @@ class ProfileSerializer(serializers.ModelSerializer):
     class Meta:
         model = Profile
         fields = ['account', 'avatar', 'nickname', 'introduction']
+
+
+class JWTLogInSerializer(TokenObtainSerializer):
+    token_class = RefreshToken
+
+    def validate(self, attrs):
+        data = super().validate(attrs)
+
+        refresh = self.get_token(self.user)
+
+        data["refresh"] = str(refresh)
+        data["access"] = str(refresh.access_token)
+        data["profile"] = ProfileSerializer(Profile.objects.get(account=self.user)).data
+
+        if api_settings.UPDATE_LAST_LOGIN:
+            update_last_login(None, self.user)
+
+        return data
