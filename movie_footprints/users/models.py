@@ -83,3 +83,6 @@ class Account(AbstractUser):
 
     class Meta:
         verbose_name = _("계정")
+
+    def __str__(self):
+        return f'{self.identifier}'

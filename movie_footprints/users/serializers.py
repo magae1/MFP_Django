@@ -53,10 +53,25 @@ class JWTLogInSerializer(TokenObtainSerializer):
         refresh = self.get_token(self.user)
 
         data["refresh"] = str(refresh)
-        data["access"] = str(refresh.access_token)
-        data["profile"] = ProfileSerializer(Profile.objects.get(account=self.user)).data
 
         if api_settings.UPDATE_LAST_LOGIN:
             update_last_login(None, self.user)
 
         return data
+
+    @classmethod
+    def get_token(cls, user):
+        token = super().get_token(user)
+
+        profile = ProfileSerializer(Profile.objects.get(account=user)).data
+        token['nickname'] = profile['nickname']
+        token['avatar'] = profile['avatar']
+        return token
+
+
+class AccountSerializer(serializers.ModelSerializer):
+    profile = ProfileSerializer(many=False)
+
+    class Meta:
+        model = Account
+        fields = ['identifier', 'last_password_changed', 'profile']

@@ -1,20 +1,19 @@
 from rest_framework import viewsets, mixins, generics, status, views
 from rest_framework.response import Response
+from rest_framework.exceptions import NotAuthenticated, NotFound
 from rest_framework.permissions import AllowAny
 from rest_framework_simplejwt.settings import api_settings
 from rest_framework_simplejwt.exceptions import InvalidToken, TokenError
 from rest_framework_simplejwt.tokens import RefreshToken
 
-from drf_spectacular.utils import extend_schema, inline_serializer
-from drf_spectacular.openapi import OpenApiParameter, OpenApiTypes, OpenApiResponse
-
 from .models import Profile, Account
 from .serializers import (
     CreateAccountSerializer,
     ProfileSerializer,
-    JWTLogInSerializer
+    JWTLogInSerializer,
+    AccountSerializer,
 )
-from .permissions import IsMeOrReadOnly
+from .permissions import IsMeOrReadOnly, IsMeOnly
 
 
 def set_refresh_cookie(response: Response, refresh_token: str) -> Response:
@@ -22,7 +21,27 @@ def set_refresh_cookie(response: Response, refresh_token: str) -> Response:
         key='refresh',
         value=refresh_token,
         path='/api/auth',
-        max_age=api_settings.REFRESH_TOKEN_LIFETIME)
+        httponly=False,
+        max_age=api_settings.REFRESH_TOKEN_LIFETIME,
+    )
+    response.set_cookie(
+        key='isLogIn',
+        value=True,
+        path='/',
+        max_age=api_settings.REFRESH_TOKEN_LIFETIME,
+    )
+    return response
+
+
+def delete_refresh_cookie(response: Response) -> Response:
+    response.delete_cookie(
+        key='refresh',
+        path='/api/auth',
+    )
+    response.delete_cookie(
+        key='isLogIn',
+        path='/',
+    )
     return response
 
 
@@ -39,6 +58,7 @@ class ProfileViewSet(mixins.UpdateModelMixin,
     queryset = Profile.objects.all()
     serializer_class = ProfileSerializer
     permission_classes = (IsMeOrReadOnly,)
+    lookup_field = 'account_id'
 
 
 class LogInView(generics.GenericAPIView):
@@ -55,12 +75,14 @@ class LogInView(generics.GenericAPIView):
             raise InvalidToken(e.args[0])
 
         data = account_serializer.validated_data
-        refresh_token = data.pop('refresh')
-        res = Response(data, status=status.HTTP_200_OK)
+        refresh_token = data['refresh']
+        res = Response({"message": "성공적으로 로그인됐습니다."}, status=status.HTTP_200_OK)
         return set_refresh_cookie(res, refresh_token)
 
 
 class RefreshView(views.APIView):
+    authentication_classes = ()
+
     def post(self, request):
         if 'refresh' not in request.COOKIES:
             return Response(data={"message": "refresh 토큰이 없습니다."}, status=status.HTTP_401_UNAUTHORIZED)
@@ -90,5 +112,14 @@ class RefreshView(views.APIView):
 class LogOutView(views.APIView):
     def post(self, request):
         res = Response({"message": "성공적으로 로그아웃됐습니다."}, status=status.HTTP_200_OK)
-        res.delete_cookie('refresh', path='/api/auth')
-        return res
+        return delete_refresh_cookie(res)
+
+
+class AccountView(generics.RetrieveUpdateDestroyAPIView):
+    queryset = Account.objects.all()
+    serializer_class = AccountSerializer
+
+    def get_object(self):
+        if self.request.auth is None:
+            raise NotAuthenticated(detail=None, code=None)
+        return self.request.user
