@@ -1,5 +1,5 @@
 from django.contrib.auth.password_validation import validate_password as validate_pw
-from django.contrib.auth.models import AbstractBaseUser, update_last_login
+from django.contrib.auth.models import  update_last_login
 
 from rest_framework import serializers
 from rest_framework.validators import UniqueValidator
@@ -74,4 +74,15 @@ class AccountSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Account
-        fields = ['identifier', 'last_password_changed', 'profile']
+        fields = ['id', 'identifier', 'last_password_changed', 'profile']
+        read_only_fields = ['identifier', 'last_password_changed']
+        depth = 1
+
+    def update(self, instance, validated_data):
+        profile_data = validated_data.pop('profile')
+        profile_obj = Profile.objects.get(account=instance)
+        profile_obj.nickname = profile_data['nickname']
+        profile_obj.introduction = profile_data['introduction']
+        profile_obj.avatar = profile_data['avatar']
+        profile_obj.sava()
+        return instance

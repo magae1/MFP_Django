@@ -1,5 +1,5 @@
 -r base.txt
 
-sphinx==7.2.5
+sphinx==7.2.6
 sphinx-autobuild==2021.3.14
 django-debug-toolbar==4.2.0

@@ -2,6 +2,7 @@
 .env.*
 dockerfiles/.env.*
 /movie_footprints/requirements.txt
+/movie_footprints/media
 .idea
 .venv
 /docs/_build

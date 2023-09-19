@@ -15,7 +15,7 @@ DEBUG = env('DEBUG', default=False)
 # SECURITY WARNING: don't run with debug turned on in production!
 SECRET_KEY = env("SECRET_KEY")
 
-ADMINS = [('magae1', 'jjilil8351@gamil.com')]
+ADMINS = [('magae', 'jjilil8351@gamil.com')]
 
 # Application definition
 INSTALLED_APPS = (
@@ -27,20 +27,22 @@ INSTALLED_APPS = (
         'django.contrib.messages',
         'django.contrib.staticfiles',
         'django.contrib.admindocs',
-    ] + [
+
         'rest_framework',
         'rest_framework_simplejwt',
         'django_otp',
         'drf_spectacular',
         'corsheaders',
-    ] + [
+        'imagekit',
+
         'users',
+
+        'django_cleanup.apps.CleanupConfig',
     ])
 
 MIDDLEWARE = [
     'corsheaders.middleware.CorsMiddleware',
     'django_otp.middleware.OTPMiddleware',
-
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',

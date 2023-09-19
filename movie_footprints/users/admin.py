@@ -9,10 +9,10 @@ class ProfileInline(admin.StackedInline):
 
 @admin.register(Account)
 class AccountAdmin(admin.ModelAdmin):
-    list_display = ['username', 'email', 'last_login']
+    readonly_fields = ["id", "identifier", "last_login"]
+    fields = [("identifier", "id"), "last_login", 'is_staff', 'is_active']
+    list_display = ['identifier', 'email', 'last_login']
     list_filter = ['last_login', 'date_joined', 'is_active', 'is_staff']
     search_fields = ['username', 'email']
 
     inlines = [ProfileInline]
-
-

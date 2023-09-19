@@ -7,6 +7,8 @@ from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
 
 from django_otp.util import random_number_token
+from imagekit.models import ProcessedImageField
+from imagekit.processors import ResizeToFill
 
 
 def random_name():
@@ -15,7 +17,10 @@ def random_name():
 
 class Profile(models.Model):
     account = models.OneToOneField('Account', on_delete=models.SET_NULL, null=True)
-    avatar = models.ImageField(_("아바타"), upload_to='profile/', blank=True)
+    avatar = ProcessedImageField(verbose_name=_("아바타"),
+                                 upload_to='avatars/',
+                                 processors=[ResizeToFill(150, 150)],
+                                 blank=True, null=True)
     nickname = models.CharField(verbose_name=_("닉네임"), default=random_name, max_length=30)
     introduction = models.CharField(verbose_name=_("소개"), max_length=300, blank=True)
 
@@ -25,7 +30,7 @@ class Profile(models.Model):
         verbose_name = _("프로필")
 
     def __str__(self):
-        return f"{self.nickname} - {self.introduction}"
+        return f"{self.nickname}"
 
 
 class AccountManager(BaseUserManager):
@@ -64,7 +69,11 @@ class Account(AbstractUser):
     first_name = None
     last_name = None
     username = None
-    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    id = models.UUIDField(
+        primary_key=True,
+        default=uuid.uuid4,
+        help_text=_("계정의 고유한 식별자입니다. 계정 생성 시 자동으로 할당됩니다."),
+        editable=False)
     identifier = models.CharField(
         _("아이디"),
         max_length=40,

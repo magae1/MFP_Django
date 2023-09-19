@@ -52,8 +52,7 @@ class AccountCreateViewSet(mixins.CreateModelMixin,
     permission_classes = (AllowAny,)
 
 
-class ProfileViewSet(mixins.UpdateModelMixin,
-                     mixins.RetrieveModelMixin,
+class ProfileViewSet(mixins.RetrieveModelMixin,
                      viewsets.GenericViewSet):
     queryset = Profile.objects.all()
     serializer_class = ProfileSerializer
