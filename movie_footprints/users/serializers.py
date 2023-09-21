@@ -42,6 +42,7 @@ class ProfileSerializer(serializers.ModelSerializer):
     class Meta:
         model = Profile
         fields = ['account', 'avatar', 'nickname', 'introduction']
+        read_only_fields = ['account']
 
 
 class JWTLogInSerializer(TokenObtainSerializer):
@@ -70,19 +71,9 @@ class JWTLogInSerializer(TokenObtainSerializer):
 
 
 class AccountSerializer(serializers.ModelSerializer):
-    profile = ProfileSerializer(many=False)
+    profile = ProfileSerializer(many=False, read_only=True)
 
     class Meta:
         model = Account
         fields = ['id', 'identifier', 'last_password_changed', 'profile']
         read_only_fields = ['identifier', 'last_password_changed']
-        depth = 1
-
-    def update(self, instance, validated_data):
-        profile_data = validated_data.pop('profile')
-        profile_obj = Profile.objects.get(account=instance)
-        profile_obj.nickname = profile_data['nickname']
-        profile_obj.introduction = profile_data['introduction']
-        profile_obj.avatar = profile_data['avatar']
-        profile_obj.sava()
-        return instance

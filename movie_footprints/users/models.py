@@ -19,7 +19,7 @@ class Profile(models.Model):
     account = models.OneToOneField('Account', on_delete=models.SET_NULL, null=True)
     avatar = ProcessedImageField(verbose_name=_("아바타"),
                                  upload_to='avatars/',
-                                 processors=[ResizeToFill(150, 150)],
+                                 processors=[ResizeToFill(200, 200)],
                                  blank=True, null=True)
     nickname = models.CharField(verbose_name=_("닉네임"), default=random_name, max_length=30)
     introduction = models.CharField(verbose_name=_("소개"), max_length=300, blank=True)

@@ -13,21 +13,21 @@ from drf_spectacular.views import (
 from users.views import (
     AccountCreateViewSet,
     ProfileViewSet,
+    AccountViewSet,
     LogInView,
     RefreshView,
     LogOutView,
-    AccountView,
 )
 
 router = DefaultRouter()
 router.register(r'auth/signup', AccountCreateViewSet)
 router.register(r'profile', ProfileViewSet)
+router.register(r'account', AccountViewSet)
 
 
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('api/', include(router.urls)),
-    path('api/account/', AccountView.as_view(), name="내 계정"),
     path('api/auth/login/', LogInView.as_view(), name="로그인"),
     path('api/auth/refresh/', RefreshView.as_view(), name="토큰 갱신"),
     path('api/auth/logout/', LogOutView.as_view(), name="로그아웃"),
