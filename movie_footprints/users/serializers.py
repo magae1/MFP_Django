@@ -45,31 +45,6 @@ class ProfileSerializer(serializers.ModelSerializer):
         read_only_fields = ['account']
 
 
-class JWTLogInSerializer(TokenObtainSerializer):
-    token_class = RefreshToken
-
-    def validate(self, attrs):
-        data = super().validate(attrs)
-
-        refresh = self.get_token(self.user)
-
-        data["refresh"] = str(refresh)
-
-        if api_settings.UPDATE_LAST_LOGIN:
-            update_last_login(None, self.user)
-
-        return data
-
-    @classmethod
-    def get_token(cls, user):
-        token = super().get_token(user)
-
-        profile = ProfileSerializer(Profile.objects.get(account=user)).data
-        token['nickname'] = profile['nickname']
-        token['avatar'] = profile['avatar']
-        return token
-
-
 class AccountSerializer(serializers.ModelSerializer):
     profile = ProfileSerializer(many=False, read_only=True)
 
