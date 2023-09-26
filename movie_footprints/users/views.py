@@ -54,20 +54,24 @@ class AccountViewSet(viewsets.GenericViewSet):
             return Profile.objects.get(account=self.request.user)
         return self.request.user
 
-    @action(detail=False, methods=['post'],)
+    @action(detail=False, methods=['get', 'post'])
     def profile(self, request, pk=None):
         profile = self.get_object()
         serializer_class = self.get_serializer_class()
-        serializer = serializer_class(profile, data=request.data)
-        serializer.is_valid(raise_exception=True)
-        serializer.save()
-        return Response(serializer.data, status=status.HTTP_202_ACCEPTED)
+        if request.method == 'GET':
+            serializer = serializer_class(instance=profile)
+            return Response(serializer.data, status=status.HTTP_200_OK)
+        else:
+            serializer = serializer_class(profile, data=request.data)
+            serializer.is_valid(raise_exception=True)
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_202_ACCEPTED)
 
     @action(detail=False, methods=['get', 'post'])
     def me(self, request, pk=None):
         account_obj = self.get_object()
         serializer_class = self.get_serializer_class()
-        if request.method == 'get':
+        if request.method == 'GET':
             serializer = serializer_class(instance=account_obj)
             return Response(serializer.data, status=status.HTTP_200_OK)
         else:

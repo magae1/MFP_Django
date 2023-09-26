@@ -1,11 +1,7 @@
 from django.contrib.auth.password_validation import validate_password as validate_pw
-from django.contrib.auth.models import  update_last_login
 
 from rest_framework import serializers
 from rest_framework.validators import UniqueValidator
-from rest_framework_simplejwt.serializers import TokenObtainSerializer
-from rest_framework_simplejwt.tokens import RefreshToken
-from rest_framework_simplejwt.settings import api_settings
 
 from .models import Profile, Account
 

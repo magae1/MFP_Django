@@ -15,6 +15,9 @@ DEBUG = env('DEBUG', default=False)
 # SECURITY WARNING: don't run with debug turned on in production!
 SECRET_KEY = env("SECRET_KEY")
 
+BOXOFFICE_KEY = env('BOXOFFICE_KEY')
+TMDB_KEY = env('TMDB_KEY')
+
 ADMINS = [('magae', 'jjilil8351@gamil.com')]
 
 # Application definition
@@ -85,6 +88,13 @@ DATABASES = {
         "PASSWORD": env("POSTGRES_PASSWORD", default=""),
         "HOST": env("POSTGRES_HOST", default=""),
         "PORT": env("POSTGRES_PORT", default=""),
+    }
+}
+
+CACHES = {
+    "default": {
+        "BACKEND": "django.core.cache.backends.redis.RedisCache",
+        "LOCATION": "redis://127.0.0.1:6379",
     }
 }
 
@@ -193,6 +203,9 @@ REST_FRAMEWORK = {
     ],
     'EXCEPTION_HANDLER': 'rest_framework.views.exception_handler',
     'DEFAULT_SCHEMA_CLASS': 'drf_spectacular.openapi.AutoSchema',
+    'DEFAULT_PARSER_CLASSES': [
+        'rest_framework.parsers.JSONParser',
+    ]
 }
 
 SIMPLE_JWT = {
@@ -208,4 +221,3 @@ SIMPLE_JWT = {
     "USER_ID_CLAIM": "account_identifier",
     "USER_AUTHENTICATION_RULE": "rest_framework_simplejwt.authentication.default_user_authentication_rule",
 }
-
