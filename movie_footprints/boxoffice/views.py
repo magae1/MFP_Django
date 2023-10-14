@@ -16,9 +16,10 @@ class BoxOfficeList(GenericAPIView):
     permission_classes = (AllowAny, )
     serializer_class = DailyBoxofficeListSerializer
 
-    @method_decorator(cache_page(60*60*4))
+    # @method_decorator(cache_page(60*60*4))
     def get(self, request, format=None):
-        target_datetime = (timezone.now() - datetime.timedelta(days=1))
+        update_datetime = timezone.now()
+        target_datetime = (update_datetime - datetime.timedelta(days=1))
         target_date = target_datetime.strftime('%Y%m%d')
         data = get_boxoffcie_list(target_date)
         for d in data:
@@ -29,6 +30,7 @@ class BoxOfficeList(GenericAPIView):
         serializer_class = self.get_serializer_class()
         serializer = serializer_class({
             'target_date': target_datetime.date(),
+            'updated_at': update_datetime,
             'list': data,
         })
         return Response(serializer.data)

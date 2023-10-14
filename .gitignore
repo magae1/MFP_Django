@@ -6,3 +6,4 @@ dockerfiles/.env.*
 .idea
 .venv
 /docs/_build
+/.serverless/

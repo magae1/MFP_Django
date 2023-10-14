@@ -20,7 +20,7 @@ from users.views import (
     AccountViewSet,
 )
 
-from movies.views import BoxOfficeList
+from boxoffice.views import BoxOfficeList
 
 router = DefaultRouter()
 router.register(r'auth/signup', AccountCreateViewSet)
@@ -31,7 +31,7 @@ router.register(r'account', AccountViewSet)
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('api/', include(router.urls)),
-    path('api/boxofficelist/', BoxOfficeList.as_view(), name="박스오피스 순위"),
+    # path('api/boxofficelist/', BoxOfficeList.as_view(), name="박스오피스 순위"),
     path('api/auth/login/', TokenObtainPairView.as_view(), name="로그인"),
     path('api/auth/refresh/', TokenRefreshView.as_view(), name="토큰 갱신"),
     path('api/schema/', SpectacularAPIView.as_view(), name='schema'),

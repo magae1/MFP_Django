@@ -19,4 +19,5 @@ class DailyBoxofficeSerializer(serializers.Serializer):
 
 class DailyBoxofficeListSerializer(serializers.Serializer):
     target_date = serializers.DateField()
+    update_at = serializers.DateTimeField()
     list = DailyBoxofficeSerializer(many=True)

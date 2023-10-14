@@ -1,0 +1,32 @@
+service: movie-footprints
+frameworkVersion: '3'
+
+provider:
+  name: aws
+  runtime: python3.11
+  region: ap-northeast-2
+
+functions:
+  api:
+    handler: wsgi_handler.handler
+    events:
+      - http: ANY /
+      - http: ANY /{proxy+}
+
+plugins:
+  - serverless-wsgi
+  - serverless-python-requirements
+
+custom:
+  pythonRequirements:
+    fileName: movie_footprints/requirements/production.txt
+    layer:
+      name: Python-requirements-layer
+      description: Python requirements lambda layer
+      compatibleRuntimes:
+        - python3.11
+      allowedAccounts:
+        - '*'
+  wsgi:
+    app: movie_footprints/config.wsgi.application
+    packRequirements: false

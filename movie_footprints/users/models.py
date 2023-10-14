@@ -86,6 +86,7 @@ class Account(AbstractUser):
         },
     )
     last_password_changed = models.DateTimeField(_("최근 비밀번호 변경일"), default=timezone.now)
+    show_spoiler = models.BooleanField(_("스포일러 포함 보이기"), default=False)
 
     USERNAME_FIELD = "identifier"
 

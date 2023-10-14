@@ -1,6 +1,4 @@
 -r base.txt
 
-gunicorn==21.2.0
-
 django-storages[s3]==1.14
-
+Werkzeug==3.0.0

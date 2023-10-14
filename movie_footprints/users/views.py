@@ -1,4 +1,4 @@
-from rest_framework import viewsets, mixins, generics, status, views
+from rest_framework import viewsets, mixins, status
 from rest_framework.parsers import MultiPartParser, JSONParser
 from rest_framework.response import Response
 from rest_framework.exceptions import NotAuthenticated
@@ -10,6 +10,7 @@ from .serializers import (
     CreateAccountSerializer,
     ProfileSerializer,
     AccountSerializer,
+    ChangePasswordSerializer,
 )
 from .permissions import IsMeOrReadOnly, IsMeOnly
 
@@ -31,20 +32,15 @@ class ProfileViewSet(mixins.RetrieveModelMixin,
 
 class AccountViewSet(viewsets.GenericViewSet):
     queryset = Account.objects.all()
-    serializer_class = AccountSerializer
     permission_classes = (IsMeOnly, )
-
-    def get_parser_class(self):
-        if self.action == 'profile':
-            return MultiPartParser
-        return JSONParser
+    parser_classes = (MultiPartParser, JSONParser)
 
     def get_serializer_class(self):
         if self.action == 'profile':
             return ProfileSerializer
-        elif self.action == 'avatar':
-            return
-        return self.serializer_class
+        elif self.action == 'change_password':
+            return ChangePasswordSerializer
+        return AccountSerializer
 
     def get_object(self):
         if self.request.auth is None:
@@ -67,16 +63,27 @@ class AccountViewSet(viewsets.GenericViewSet):
             serializer.save()
             return Response(serializer.data, status=status.HTTP_202_ACCEPTED)
 
-    @action(detail=False, methods=['get', 'post'])
+    @action(detail=False, methods=['get'])
     def me(self, request, pk=None):
         account_obj = self.get_object()
         serializer_class = self.get_serializer_class()
-        if request.method == 'GET':
-            serializer = serializer_class(instance=account_obj)
-            return Response(serializer.data, status=status.HTTP_200_OK)
-        else:
-            serializer = serializer_class(instance=account_obj, data=request.data)
-            serializer.is_valid(raise_exception=True)
-            serializer.save()
-            return Response(serializer.data, status=status.HTTP_202_ACCEPTED)
+        serializer = serializer_class(instance=account_obj)
+        return Response(serializer.data, status=status.HTTP_200_OK)
 
+    @action(detail=False, methods=['post'])
+    def setting(self, request, pk=None):
+        account_obj = self.get_object()
+        serializer_class = self.get_serializer_class()
+        serializer = serializer_class(account_obj, data=request.data)
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
+        return Response(serializer.data, status=status.HTTP_202_ACCEPTED)
+
+    @action(detail=False, methods=['post'])
+    def change_password(self, request, pk=None):
+        account_obj = self.get_object()
+        serializer_class = self.get_serializer_class()
+        serializer = serializer_class(account_obj, data=request.data)
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
+        return Response({"message": "비밀번호가 성공적으로 변경됐습니다."}, status=status.HTTP_202_ACCEPTED)
